@@ -12,14 +12,14 @@
 </script>
 
 <script type="text/template" id="page-view-template">
-    <h3><%=title%></h3>
+    <h3>
+        <div class="title" contenteditable="true"><%=title%></div>
+    </h3>
     <p>
     <div role="form">
         <div class="form-group">
             <div class="view" contenteditable="true"><%=content%></div>
         </div>
-
-
         <button type="button" class="btn btn-default" id="del">Delete</button>
     </div>
     </p>
