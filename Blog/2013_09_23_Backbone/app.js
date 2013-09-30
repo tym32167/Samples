@@ -21,13 +21,32 @@
             }
         });
 
-        // Конструктор коллекции страниц
-        var PageCollection = Backbone.Collection.extend({
-            // Указываем, с каким типом модедей будем работать
-            model:PageItem,
+        // Конструктор представления для рендеринга страницы в области навигации
+        var PageViewNav = Backbone.View.extend({
+            // Тег контейнера, в котором будет рендериться все представление
+            tagName:'li',
 
-            // Устанавливаем хранилище для элементов страниц - локальное хранилище
-            localStorage: new Backbone.LocalStorage("pages")
+            // Инициализация.
+            initialize: function() {
+
+                // Перерисовываем если модель изменяется
+                this.listenTo(this.model, 'change', this.render);
+
+                // Удаляем представление, если модель удалена
+                this.listenTo(this.model, 'destroy', this.remove);
+            },
+
+            // Мы заводим собственное поле template - своеобразный кеш для переменной.
+            // То есть мы могли бы и при рендеринге каждый раз получать этот темплейт, но чтобы
+            // не быть расточительными, сохраним эту переменную сразу
+            template: _.template($('#page-nav-template').text()),
+
+            // Метод занимается отображением нашего представления.
+            // По сути мы просто применяем нашу модель к шаблону (темплейту)
+            render:function(){
+                this.$el.html(this.template(this.model.attributes));
+                return this;
+            }
         });
 
         // Конструктор представления для рендеринга контента страницы
@@ -78,27 +97,13 @@
             }
         });
 
-        // Конструктор представления для рендеринга страницы в области навигации
-        var PageViewNav = Backbone.View.extend({
-            // Тег контейнера, в котором будет рендериться все представление
-            tagName:'li',
+        // Конструктор коллекции страниц
+        var PageCollection = Backbone.Collection.extend({
+            // Указываем, с каким типом модедей будем работать
+            model:PageItem,
 
-            // Инициализация.
-            initialize: function() {
-
-                // Перерисовываем если модель изменяется
-                this.listenTo(this.model, 'change', this.render);
-
-                // Удаляем представление, если модель удалена
-                this.listenTo(this.model, 'destroy', this.remove);
-            },
-
-            // Все аналогично предыдущему представлению
-            template: _.template($('#page-nav-template').text()),
-            render:function(){
-                this.$el.html(this.template(this.model.attributes));
-                return this;
-            }
+            // Устанавливаем хранилище для элементов страниц - локальное хранилище
+            localStorage: new Backbone.LocalStorage("pages")
         });
 
         // Коллекция страниц. Инициализируем её тут, так как далее в определениях
@@ -187,7 +192,7 @@
         // Роутер
         var router = new WorkspaceRouter();
 
-        // Запускаем историю. 
+        // Запускаем историю.
         Backbone.history.start();
     });
 })(jQuery);
